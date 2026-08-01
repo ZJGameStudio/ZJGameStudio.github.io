@@ -70,27 +70,39 @@
   header{
     position:fixed; top:0; left:0; right:0; z-index:100;
     display:flex; align-items:center; justify-content:space-between;
-    padding:26px 40px;
+    padding:20px 40px;
     transition:padding .4s var(--ease), background .4s var(--ease), border-color .4s var(--ease);
     border-bottom:1px solid transparent;
   }
   header.scrolled{
-    padding:16px 40px;
+    padding:14px 40px;
     background:rgba(18,24,74,0.86);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
 
-  /* Logo Styles */
+  /* Header Logo Styles */
   .logo-link {
-    display:flex; align-items:center; gap:12px;
+    display:flex; align-items:center; gap:14px;
   }
   .site-logo {
-    height:32px;
+    height:56px;
     width:auto;
     display:block;
     object-fit:contain;
-    transition:transform .3s var(--ease);
+    transition:height .4s var(--ease), transform .3s var(--ease);
+  }
+  header.scrolled .site-logo {
+    height:42px;
+  }
+  .logo-text {
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.35rem;
+    letter-spacing:-0.01em;
+  }
+  .logo-text span {
+    color:var(--signal);
   }
   .logo-link:hover .site-logo {
     transform:scale(1.04);
@@ -314,7 +326,7 @@
   /* ---------- footer ---------- */
   footer{padding:60px 40px 40px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;}
   .footer-left{display:flex; align-items:center; gap:18px;}
-  .footer-logo{height:20px; width:auto; opacity:0.7;}
+  .footer-logo{height:28px; width:auto; opacity:0.7;}
   footer .mono{font-size:0.75rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em;}
   .footer-links{display:flex; gap:26px;}
   .footer-links a{font-size:0.78rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em; transition:color .3s;}
@@ -323,6 +335,7 @@
   @media (max-width:760px){
     nav ul, .nav-cta{display:none;}
     header{padding:20px;}
+    .site-logo{height:44px;}
     .hero{padding:120px 20px 0;}
     section{padding:90px 20px;}
     .cta-section{margin:0 20px; padding:60px 28px;}
@@ -342,7 +355,8 @@
 
 <header id="siteHeader">
   <a href="#" class="logo-link" data-hover>
-    <img src="zj-logo.png" alt="ZJGameStudio" class="site-logo">
+    <img src="zj-logo.png" alt="ZJ Logo" class="site-logo">
+    <span class="logo-text">ZJ<span>GameStudio</span></span>
   </a>
   <nav>
     <ul>
