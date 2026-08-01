@@ -80,11 +80,22 @@
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
-  .logo{
-    font-family:'Fraunces', serif; font-weight:600; font-size:1.35rem; letter-spacing:-0.01em;
-    display:flex; align-items:center; gap:8px;
+
+  /* Logo Styles */
+  .logo-link {
+    display:flex; align-items:center; gap:12px;
   }
-  .logo span{color:var(--signal);}
+  .site-logo {
+    height:32px;
+    width:auto;
+    display:block;
+    object-fit:contain;
+    transition:transform .3s var(--ease);
+  }
+  .logo-link:hover .site-logo {
+    transform:scale(1.04);
+  }
+
   nav ul{list-style:none; display:flex; gap:38px;}
   nav a{
     font-size:0.82rem; text-transform:uppercase; letter-spacing:0.09em; font-weight:500;
@@ -102,7 +113,6 @@
     transition:background .3s var(--ease), color .3s var(--ease), border-color .3s;
   }
   .nav-cta:hover{background:var(--signal); color:var(--ink-deep); border-color:var(--signal);}
-  .menu-toggle{display:none;}
 
   /* ---------- hero ---------- */
   .hero{
@@ -187,7 +197,7 @@
   .reveal{opacity:0; transform:translateY(36px); transition:opacity .9s var(--ease), transform .9s var(--ease);}
   .reveal.in{opacity:1; transform:translateY(0);}
 
-  /* ---------- work ledger (signature element) ---------- */
+  /* ---------- work ledger ---------- */
   .ledger{border-top:1px solid var(--line);}
   .ledger-row{
     position:relative; border-bottom:1px solid var(--line);
@@ -296,13 +306,15 @@
   .cta-meta div p:first-child{font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.55; margin-bottom:6px;}
   .cta-meta div p:last-child{font-size:0.95rem;}
 
-  .cta-bg-mark{
-    position:absolute; right:-60px; bottom:-90px; font-family:'Fraunces',serif; font-size:22rem; font-weight:600;
-    color:rgba(11,16,48,0.045); line-height:1; pointer-events:none; user-select:none;
+  .cta-bg-mark-img{
+    position:absolute; right:-40px; bottom:-40px; height:340px; width:auto;
+    opacity:0.04; pointer-events:none; user-select:none; filter:grayscale(100%);
   }
 
   /* ---------- footer ---------- */
   footer{padding:60px 40px 40px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;}
+  .footer-left{display:flex; align-items:center; gap:18px;}
+  .footer-logo{height:20px; width:auto; opacity:0.7;}
   footer .mono{font-size:0.75rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em;}
   .footer-links{display:flex; gap:26px;}
   .footer-links a{font-size:0.78rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em; transition:color .3s;}
@@ -314,7 +326,7 @@
     .hero{padding:120px 20px 0;}
     section{padding:90px 20px;}
     .cta-section{margin:0 20px; padding:60px 28px;}
-    .cta-bg-mark{display:none;}
+    .cta-bg-mark-img{display:none;}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -329,7 +341,9 @@
 <div class="cursor-ring" id="cursorRing"></div>
 
 <header id="siteHeader">
-  <div class="logo">ZJ<span>GameStudio</span></div>
+  <a href="#" class="logo-link" data-hover>
+    <img src="zj-logo.png" alt="ZJGameStudio" class="site-logo">
+  </a>
   <nav>
     <ul>
       <li><a href="#work">Work</a></li>
@@ -517,7 +531,7 @@
 <!-- ================= CTA / CONTACT ================= -->
 <section id="contact" style="padding-left:0; padding-right:0;">
   <div class="cta-section">
-    <span class="cta-bg-mark">ZJ</span>
+    <img src="zj-logo.png" alt="" class="cta-bg-mark-img" aria-hidden="true">
     <h2>Got a game<br>worth <em>shipping right</em>?</h2>
     <div class="cta-row">
       <a href="mailto:hello@zjgamestudio.com" class="cta-email" data-hover>
@@ -534,7 +548,10 @@
 </section>
 
 <footer>
-  <p class="mono">© 2026 ZJGameStudio LLC</p>
+  <div class="footer-left">
+    <img src="zj-logo.png" alt="ZJGameStudio" class="footer-logo">
+    <p class="mono">© 2026 ZJGameStudio LLC</p>
+  </div>
   <div class="footer-links">
     <a href="#" data-hover>Instagram</a>
     <a href="#" data-hover>LinkedIn</a>
