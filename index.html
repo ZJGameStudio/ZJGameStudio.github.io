@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZJGameStudio — Game Development Studio</title>
+<meta name="description" content="ZJGameStudio is a game development studio. We design, build, and ship games for clients who want to make something players remember.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,400;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12184a;
+    --ink-deep:#0b1030;
+    --paper:#f4efe2;
+    --paper-dim:#d9d2bf;
+    --signal:#e2ff5c;
+    --coral:#ff6b4a;
+    --slate:#5b699e;
+    --line: rgba(244,239,226,0.16);
+    --ease: cubic-bezier(.16,.84,.44,1);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Space Grotesk', sans-serif;
+    overflow-x:hidden;
+    cursor:none;
+  }
+
+  ::selection{background:var(--signal);color:var(--ink-deep);}
+
+  a{color:inherit;text-decoration:none;}
+
+  .display{font-family:'Fraunces', serif;}
+  .mono{font-family:'IBM Plex Mono', monospace; letter-spacing:0.02em;}
+
+  /* ---------- grain overlay ---------- */
+  .grain{
+    position:fixed; inset:0; pointer-events:none; z-index:200;
+    opacity:0.045; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- custom cursor ---------- */
+  .cursor{
+    position:fixed; top:0; left:0; width:10px; height:10px; border-radius:50%;
+    background:var(--signal); pointer-events:none; z-index:999;
+    transform:translate(-50%,-50%); transition:width .25s var(--ease),height .25s var(--ease),background .25s var(--ease), opacity .3s;
+    mix-blend-mode:difference;
+  }
+  .cursor-ring{
+    position:fixed; top:0; left:0; width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--paper-dim); pointer-events:none; z-index:998;
+    transform:translate(-50%,-50%); transition:width .3s var(--ease), height .3s var(--ease), border-color .3s, opacity .3s;
+  }
+  .cursor.big{width:70px;height:70px;background:transparent;border:1px solid var(--signal);}
+  .cursor-ring.hide{opacity:0;}
+  @media (hover:none), (pointer:coarse){
+    .cursor, .cursor-ring{display:none;}
+    body{cursor:auto;}
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:26px 40px;
+    transition:padding .4s var(--ease), background .4s var(--ease), border-color .4s var(--ease);
+    border-bottom:1px solid transparent;
+  }
+  header.scrolled{
+    padding:16px 40px;
+    background:rgba(18,24,74,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{
+    font-family:'Fraunces', serif; font-weight:600; font-size:1.35rem; letter-spacing:-0.01em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo span{color:var(--signal);}
+  nav ul{list-style:none; display:flex; gap:38px;}
+  nav a{
+    font-size:0.82rem; text-transform:uppercase; letter-spacing:0.09em; font-weight:500;
+    position:relative; padding-bottom:4px; opacity:0.86;
+  }
+  nav a::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:1px; background:var(--signal);
+    transition:width .35s var(--ease);
+  }
+  nav a:hover::after{width:100%;}
+  nav a:hover{opacity:1;}
+  .nav-cta{
+    border:1px solid var(--paper-dim); border-radius:100px; padding:9px 20px;
+    font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:500;
+    transition:background .3s var(--ease), color .3s var(--ease), border-color .3s;
+  }
+  .nav-cta:hover{background:var(--signal); color:var(--ink-deep); border-color:var(--signal);}
+  .menu-toggle{display:none;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
+    position:relative; padding:150px 40px 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 10%, rgba(226,255,92,0.10), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 10% 90%, rgba(255,107,74,0.08), transparent 60%);
+  }
+  .hero-eyebrow{
+    display:flex; align-items:center; gap:12px; margin-bottom:26px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%; background:var(--signal); box-shadow:0 0 12px var(--signal); animation:pulse 2.4s ease-in-out infinite;}
+  @keyframes pulse{ 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(.7);} }
+  .hero-eyebrow p{font-size:0.78rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--paper-dim);}
+
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:450;
+    font-size:clamp(3rem, 9vw, 8.4rem);
+    line-height:0.92;
+    letter-spacing:-0.02em;
+    max-width:1200px;
+  }
+  .hero h1 em{
+    font-style:italic; font-weight:400; color:var(--signal);
+  }
+  .hero-line{overflow:hidden; padding-bottom:0.06em;}
+  .hero-line span{
+    display:inline-block;
+    transform:translateY(115%);
+    animation:riseUp 1s var(--ease) forwards;
+  }
+
+  @keyframes riseUp{ to{ transform:translateY(0); } }
+
+  .hero-foot{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:56px; padding-bottom:38px; border-top:1px solid var(--line); padding-top:26px;
+    opacity:0; animation:fadeUp 1s var(--ease) forwards; animation-delay:1.1s;
+  }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+  .hero-foot p{max-width:360px; font-size:0.95rem; line-height:1.5; color:var(--paper-dim);}
+  .scroll-cue{display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .scroll-cue .mono{font-size:0.7rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.1em;}
+  .scroll-line{width:1px; height:44px; background:linear-gradient(var(--paper-dim), transparent); position:relative; overflow:hidden;}
+  .scroll-line::after{
+    content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:var(--signal);
+    animation:scrollDown 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollDown{ to{ top:100%; } }
+
+  /* ---------- marquee ---------- */
+  .marquee-strip{
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    overflow:hidden; white-space:nowrap; padding:16px 0; background:var(--ink-deep);
+  }
+  .marquee-track{display:inline-flex; animation:marquee 32s linear infinite;}
+  .marquee-track span{
+    font-family:'Fraunces', serif; font-style:italic; font-size:1.15rem; font-weight:400;
+    padding:0 34px; color:var(--paper-dim); display:inline-flex; align-items:center; gap:34px;
+  }
+  .marquee-track span::after{content:'—'; color:var(--coral); font-style:normal;}
+  @keyframes marquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+  /* ---------- section shell ---------- */
+  section{padding:150px 40px; position:relative;}
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:40px;
+    margin-bottom:80px; flex-wrap:wrap;
+  }
+  .kicker{
+    display:flex; align-items:center; gap:10px; margin-bottom:20px;
+  }
+  .kicker .bar{width:24px; height:1px; background:var(--coral);}
+  .kicker p{font-size:0.78rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--coral); font-weight:500;}
+  .section-head h2{
+    font-family:'Fraunces', serif; font-weight:450; font-size:clamp(2.2rem,4.4vw,4rem); letter-spacing:-0.01em; max-width:700px;
+  }
+  .section-head .sub{max-width:340px; color:var(--paper-dim); font-size:0.98rem; line-height:1.6; padding-bottom:6px;}
+
+  .reveal{opacity:0; transform:translateY(36px); transition:opacity .9s var(--ease), transform .9s var(--ease);}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- work ledger (signature element) ---------- */
+  .ledger{border-top:1px solid var(--line);}
+  .ledger-row{
+    position:relative; border-bottom:1px solid var(--line);
+    display:grid; grid-template-columns:60px 1fr auto auto 140px;
+    align-items:center; gap:28px; padding:34px 8px; cursor:none;
+    overflow:hidden; transition:padding .5s var(--ease);
+  }
+  .ledger-row:hover{padding-left:28px;}
+  .ledger-num{font-family:'IBM Plex Mono',monospace; font-size:0.8rem; color:var(--slate);}
+  .ledger-title{
+    font-family:'Fraunces', serif; font-weight:450; font-size:clamp(1.5rem,3vw,2.6rem);
+    letter-spacing:-0.01em; position:relative; z-index:2; transition:color .4s;
+  }
+  .ledger-row:hover .ledger-title{color:var(--signal);}
+  .ledger-tags{display:flex; gap:8px; flex-wrap:wrap; z-index:2;}
+  .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em;
+    border:1px solid var(--line); border-radius:100px; padding:5px 11px; color:var(--paper-dim); white-space:nowrap;
+  }
+  .ledger-year{font-family:'IBM Plex Mono',monospace; font-size:0.85rem; color:var(--paper-dim); z-index:2;}
+  .ledger-arrow{
+    justify-self:end; width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; z-index:2;
+    transition:background .4s var(--ease), border-color .4s var(--ease), transform .5s var(--ease);
+  }
+  .ledger-row:hover .ledger-arrow{background:var(--signal); border-color:var(--signal); transform:rotate(45deg);}
+  .ledger-arrow svg{width:16px; height:16px; stroke:var(--paper);}
+  .ledger-row:hover .ledger-arrow svg{stroke:var(--ink-deep);}
+
+  .ledger-panel{
+    position:absolute; top:0; right:0; height:100%; width:340px; max-width:42%;
+    clip-path:inset(0 0 0 100%);
+    transition:clip-path .6s var(--ease);
+    z-index:1; overflow:hidden;
+  }
+  .ledger-row:hover .ledger-panel{clip-path:inset(0 0 0 0%);}
+  .ledger-panel img{width:100%;height:100%;object-fit:cover; filter:saturate(0.85) contrast(1.05);}
+  .ledger-panel::after{content:''; position:absolute; inset:0; background:linear-gradient(90deg, var(--ink) 0%, transparent 40%);}
+
+  @media (max-width:900px){
+    .ledger-row{grid-template-columns:34px 1fr auto; row-gap:14px;}
+    .ledger-tags, .ledger-year{display:none;}
+    .ledger-panel{display:none;}
+  }
+
+  /* ---------- process ---------- */
+  .process-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);
+    border:1px solid var(--line); border-radius:18px; overflow:hidden;
+  }
+  .process-card{
+    background:var(--ink); padding:44px 30px; position:relative; min-height:290px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    transition:background .4s var(--ease);
+  }
+  .process-card:hover{background:var(--ink-deep);}
+  .process-num{font-family:'IBM Plex Mono',monospace; color:var(--coral); font-size:0.85rem;}
+  .process-card h3{font-family:'Fraunces',serif; font-weight:450; font-size:1.5rem; margin-top:50px; letter-spacing:-0.01em;}
+  .process-card p{color:var(--paper-dim); font-size:0.92rem; line-height:1.6; margin-top:14px;}
+  @media (max-width:900px){ .process-grid{grid-template-columns:1fr;} }
+
+  /* ---------- stats ---------- */
+  .stats{
+    display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .stat{padding:56px 24px; border-left:1px solid var(--line); text-align:left;}
+  .stat:first-child{border-left:none;}
+  .stat .num{
+    font-family:'Fraunces', serif; font-weight:450; font-size:clamp(2.4rem,5vw,4.2rem); color:var(--signal); letter-spacing:-0.02em;
+  }
+  .stat p{color:var(--paper-dim); font-size:0.85rem; margin-top:10px; text-transform:uppercase; letter-spacing:0.06em;}
+  @media (max-width:900px){ .stats{grid-template-columns:repeat(2,1fr);} .stat:nth-child(3){border-left:none;} }
+
+  /* ---------- testimonial ---------- */
+  .testimonial{
+    text-align:center; max-width:920px; margin:0 auto; padding:170px 40px;
+  }
+  .testimonial .mark{font-family:'Fraunces',serif; font-size:5rem; color:var(--coral); line-height:0; display:block; margin-bottom:20px;}
+  .testimonial blockquote{
+    font-family:'Fraunces', serif; font-weight:400; font-style:italic;
+    font-size:clamp(1.5rem,3.4vw,2.6rem); line-height:1.35; letter-spacing:-0.01em;
+  }
+  .testimonial .attr{margin-top:34px; font-family:'IBM Plex Mono',monospace; font-size:0.85rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em;}
+
+  /* ---------- contact / cta ---------- */
+  .cta-section{
+    background:var(--paper); color:var(--ink-deep); border-radius:28px; margin:0 40px; padding:110px 60px;
+    position:relative; overflow:hidden;
+  }
+  .cta-section h2{
+    font-family:'Fraunces',serif; font-weight:450; font-size:clamp(2.6rem,7vw,6rem); letter-spacing:-0.02em; max-width:900px; line-height:0.98;
+  }
+  .cta-section h2 em{font-style:italic; color:var(--coral);}
+  .cta-row{display:flex; justify-content:space-between; align-items:flex-end; margin-top:70px; flex-wrap:wrap; gap:30px;}
+  .cta-email{
+    font-family:'Fraunces', serif; font-style:italic; font-size:clamp(1.4rem,2.6vw,2rem);
+    border-bottom:1px solid var(--ink-deep); padding-bottom:6px; display:inline-flex; align-items:center; gap:14px;
+  }
+  .cta-email .arrow-btn{
+    width:42px; height:42px; border-radius:50%; background:var(--ink-deep); display:flex; align-items:center; justify-content:center;
+    transition:transform .4s var(--ease), background .4s;
+  }
+  .cta-email .arrow-btn svg{width:16px; height:16px; stroke:var(--paper);}
+  .cta-email:hover .arrow-btn{transform:rotate(45deg); background:var(--coral);}
+  .cta-meta{display:flex; gap:50px; flex-wrap:wrap;}
+  .cta-meta div p:first-child{font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.55; margin-bottom:6px;}
+  .cta-meta div p:last-child{font-size:0.95rem;}
+
+  .cta-bg-mark{
+    position:absolute; right:-60px; bottom:-90px; font-family:'Fraunces',serif; font-size:22rem; font-weight:600;
+    color:rgba(11,16,48,0.045); line-height:1; pointer-events:none; user-select:none;
+  }
+
+  /* ---------- footer ---------- */
+  footer{padding:60px 40px 40px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;}
+  footer .mono{font-size:0.75rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em;}
+  .footer-links{display:flex; gap:26px;}
+  .footer-links a{font-size:0.78rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em; transition:color .3s;}
+  .footer-links a:hover{color:var(--signal);}
+
+  @media (max-width:760px){
+    nav ul, .nav-cta{display:none;}
+    header{padding:20px;}
+    .hero{padding:120px 20px 0;}
+    section{padding:90px 20px;}
+    .cta-section{margin:0 20px; padding:60px 28px;}
+    .cta-bg-mark{display:none;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<header id="siteHeader">
+  <div class="logo">ZJ<span>GameStudio</span></div>
+  <nav>
+    <ul>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#studio">Studio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <a href="#contact" class="nav-cta" data-hover>Start a project</a>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-eyebrow"><span class="dot"></span><p class="mono">Game development studio — est. 2016 — open for new work</p></div>
+  <h1>
+    <span class="hero-line" style="animation-delay:.05s"><span style="animation-delay:.05s">We build the</span></span><br>
+    <span class="hero-line"><span style="animation-delay:.18s">games worth</span></span><br>
+    <span class="hero-line"><span style="animation-delay:.3s">missing your <em>stop</em> for.</span></span>
+  </h1>
+  <div class="hero-foot">
+    <p>ZJGameStudio is a nine-person studio in New York and Lisbon. We design, build, and co-develop games for publishers and studios who'd rather ship something players remember than something safe.</p>
+    <div class="scroll-cue"><p class="mono">Scroll</p><div class="scroll-line"></div></div>
+  </div>
+</section>
+
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <span>Hollow Fathom</span><span>Riftbound</span><span>Nordlicht Games</span><span>Scrapyard Dogs</span><span>Astral Freight</span><span>Union Arcade</span>
+    <span>Hollow Fathom</span><span>Riftbound</span><span>Nordlicht Games</span><span>Scrapyard Dogs</span><span>Astral Freight</span><span>Union Arcade</span>
+  </div>
+</div>
+
+<!-- ================= WORK LEDGER ================= -->
+<section id="work">
+  <div class="section-head reveal">
+    <div>
+      <div class="kicker"><span class="bar"></span><p>Selected work</p></div>
+      <h2>Six titles, six different players to win over.</h2>
+    </div>
+    <p class="sub">Every game below shipped in the last eighteen months. Hover a row for a closer look, or open the full case study.</p>
+  </div>
+
+  <div class="ledger reveal">
+
+    <div class="ledger-row" data-hover>
+      <span class="ledger-num mono">01</span>
+      <span class="ledger-title">Hollow Fathom</span>
+      <span class="ledger-tags"><span class="tag">Deep-sea horror</span><span class="tag">PC / PS5</span></span>
+      <span class="ledger-year">2025</span>
+      <span class="ledger-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+      <div class="ledger-panel"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop" alt="Hollow Fathom gameplay mood"></div>
+    </div>
+
+    <div class="ledger-row" data-hover>
+      <span class="ledger-num mono">02</span>
+      <span class="ledger-title">Riftbound</span>
+      <span class="ledger-tags"><span class="tag">Tactics RPG</span><span class="tag">Switch</span></span>
+      <span class="ledger-year">2025</span>
+      <span class="ledger-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+      <div class="ledger-panel"><img src="https://images.unsplash.com/photo-1580327344181-c1163234e5a0?q=80&w=800&auto=format&fit=crop" alt="Riftbound handheld gameplay"></div>
+    </div>
+
+    <div class="ledger-row" data-hover>
+      <span class="ledger-num mono">03</span>
+      <span class="ledger-title">Nordlicht Games</span>
+      <span class="ledger-tags"><span class="tag">Co-development</span><span class="tag">Engine work</span></span>
+      <span class="ledger-year">2024</span>
+      <span class="ledger-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+      <div class="ledger-panel"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop" alt="Nordlicht Games development studio"></div>
+    </div>
+
+    <div class="ledger-row" data-hover>
+      <span class="ledger-num mono">04</span>
+      <span class="ledger-title">Scrapyard Dogs</span>
+      <span class="ledger-tags"><span class="tag">Multiplayer shooter</span><span class="tag">Mobile</span></span>
+      <span class="ledger-year">2024</span>
+      <span class="ledger-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+      <div class="ledger-panel"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800&auto=format&fit=crop" alt="Scrapyard Dogs mobile gameplay"></div>
+    </div>
+
+    <div class="ledger-row" data-hover>
+      <span class="ledger-num mono">05</span>
+      <span class="ledger-title">Astral Freight</span>
+      <span class="ledger-tags"><span class="tag">Sim / strategy</span><span class="tag">PC</span></span>
+      <span class="ledger-year">2023</span>
+      <span class="ledger-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+      <div class="ledger-panel"><img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=800&auto=format&fit=crop" alt="Astral Freight strategy game setup"></div>
+    </div>
+
+    <div class="ledger-row" data-hover>
+      <span class="ledger-num mono">06</span>
+      <span class="ledger-title">Union Arcade</span>
+      <span class="ledger-tags"><span class="tag">Party collection</span><span class="tag">Cross-platform</span></span>
+      <span class="ledger-year">2023</span>
+      <span class="ledger-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+      <div class="ledger-panel"><img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=800&auto=format&fit=crop" alt="Union Arcade party game night"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section id="process">
+  <div class="section-head reveal">
+    <div>
+      <div class="kicker"><span class="bar"></span><p>How we work</p></div>
+      <h2>Four stages. No surprises three sprints in.</h2>
+    </div>
+    <p class="sub">The same process runs whether the build takes six weeks or six months — only the depth of each stage changes.</p>
+  </div>
+
+  <div class="process-grid reveal">
+    <div class="process-card">
+      <span class="process-num mono">01 — Week 1</span>
+      <div>
+        <h3>Prototype</h3>
+        <p>We build the core loop first, on paper if we have to, until we know the game is fun before a single asset exists.</p>
+      </div>
+    </div>
+    <div class="process-card">
+      <span class="process-num mono">02 — Weeks 2–3</span>
+      <div>
+        <h3>Direction</h3>
+        <p>Art, systems, and platform locked against the brief, not against whatever we shipped last time.</p>
+      </div>
+    </div>
+    <div class="process-card">
+      <span class="process-num mono">03 — Weeks 4–8</span>
+      <div>
+        <h3>Build</h3>
+        <p>Design and engineering sit in the same sprint. What you playtest in review is what ships, not a mockup.</p>
+      </div>
+    </div>
+    <div class="process-card">
+      <span class="process-num mono">04 — Ongoing</span>
+      <div>
+        <h3>Launch &amp; live-ops</h3>
+        <p>Certification, store pages, and patch support your team can run with after we hand over the build.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<div class="stats reveal">
+  <div class="stat"><div class="num" data-count="9">0</div><p>People on the team</p></div>
+  <div class="stat"><div class="num" data-count="14">0</div><p>Titles shipped</p></div>
+  <div class="stat"><div class="num" data-count="6">0</div><p>Platforms supported</p></div>
+  <div class="stat"><div class="num" data-count="94" data-suffix="%">0</div><p>Clients who return</p></div>
+</div>
+
+<!-- ================= TESTIMONIAL ================= -->
+<section class="testimonial reveal">
+  <span class="mark">"</span>
+  <blockquote>They protected the core loop through every milestone review — then shipped the build in eight weeks instead of eight months.</blockquote>
+  <p class="attr">Elin Voss — Executive Producer, Nordlicht Games</p>
+</section>
+
+<!-- ================= STUDIO ================= -->
+<section id="studio">
+  <div class="section-head reveal">
+    <div>
+      <div class="kicker"><span class="bar"></span><p>The studio</p></div>
+      <h2>Small on purpose. Every project gets the full team.</h2>
+    </div>
+    <p class="sub">We turn down more work than we take. It's the only way nine people stay this involved in every case.</p>
+  </div>
+  <div class="reveal" style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:70px; align-items:start;">
+    <p style="font-family:'Fraunces',serif; font-weight:400; font-size:clamp(1.4rem,2.6vw,2.1rem); line-height:1.5; letter-spacing:-0.01em; max-width:640px;">
+      ZJGameStudio started as three friends prototyping on a shared laptop in Brooklyn. Nine years on, we're still a studio, not a contractor pool — no producer layer between you and the people building the game, and no title passed off once the pitch is won.
+    </p>
+    <div style="display:flex; flex-direction:column; gap:26px;">
+      <div style="border-top:1px solid var(--line); padding-top:18px;">
+        <p class="mono" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--paper-dim); margin-bottom:8px;">Disciplines</p>
+        <p>Game design, gameplay &amp; engine programming, art direction, narrative, audio, live-ops.</p>
+      </div>
+      <div style="border-top:1px solid var(--line); padding-top:18px;">
+        <p class="mono" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--paper-dim); margin-bottom:8px;">Studios</p>
+        <p>New York, NY &amp; Lisbon, PT — working across both time zones on every engagement.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA / CONTACT ================= -->
+<section id="contact" style="padding-left:0; padding-right:0;">
+  <div class="cta-section">
+    <span class="cta-bg-mark">ZJ</span>
+    <h2>Got a game<br>worth <em>shipping right</em>?</h2>
+    <div class="cta-row">
+      <a href="mailto:hello@zjgamestudio.com" class="cta-email" data-hover>
+        hello@zjgamestudio.com
+        <span class="arrow-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+      </a>
+      <div class="cta-meta">
+        <div><p class="mono">Response time</p><p>Within 2 business days</p></div>
+        <div><p class="mono">Currently</p><p>Booking for Q1 2027</p></div>
+        <div><p class="mono">Based in</p><p>New York &amp; Lisbon</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="mono">© 2026 ZJGameStudio LLC</p>
+  <div class="footer-links">
+    <a href="#" data-hover>Instagram</a>
+    <a href="#" data-hover>LinkedIn</a>
+    <a href="#" data-hover>Read.cv</a>
+  </div>
+</footer>
+
+<script>
+  // ---------- custom cursor ----------
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0, rx=0, ry=0;
+  window.addEventListener('mousemove', e=>{
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx+'px'; cursor.style.top = my+'px';
+  });
+  function ringLoop(){
+    rx += (mx-rx)*0.16; ry += (my-ry)*0.16;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(ringLoop);
+  }
+  ringLoop();
+
+  document.querySelectorAll('[data-hover], a, button, .ledger-row').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>{ cursor.classList.add('big'); ring.classList.add('hide'); });
+    el.addEventListener('mouseleave', ()=>{ cursor.classList.remove('big'); ring.classList.remove('hide'); });
+  });
+
+  // ---------- header shrink on scroll ----------
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', ()=>{
+    header.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive:true });
+
+  // ---------- scroll reveals ----------
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold:0.12 });
+  revealEls.forEach(el=>io.observe(el));
+
+  // ---------- counter animation ----------
+  const counters = document.querySelectorAll('.stat .num');
+  const cio = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const target = parseInt(el.dataset.count, 10);
+        const suffix = el.dataset.suffix || '';
+        const dur = 1400;
+        const start = performance.now();
+        function tick(now){
+          const p = Math.min((now-start)/dur, 1);
+          const eased = 1 - Math.pow(1-p, 3);
+          el.textContent = Math.round(eased*target) + suffix;
+          if(p<1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        cio.unobserve(el);
+      }
+    });
+  }, { threshold:0.4 });
+  counters.forEach(el=>cio.observe(el));
+
+  // ---------- smooth anchor scroll offset ----------
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      const id = a.getAttribute('href');
+      if(id.length>1){
+        const target = document.querySelector(id);
+        if(target){
+          e.preventDefault();
+          window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 90, behavior:'smooth' });
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
