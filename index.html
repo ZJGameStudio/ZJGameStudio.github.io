@@ -81,24 +81,24 @@
     border-bottom:1px solid var(--line);
   }
 
-  /* Header Logo Styles */
+  /* Header Logo Styles - 2x Size */
   .logo-link {
-    display:flex; align-items:center; gap:14px;
+    display:flex; align-items:center; gap:18px;
   }
   .site-logo {
-    height:56px;
+    height:112px; /* Doubled from 56px */
     width:auto;
     display:block;
     object-fit:contain;
     transition:height .4s var(--ease), transform .3s var(--ease);
   }
   header.scrolled .site-logo {
-    height:42px;
+    height:84px; /* Scaled down on scroll */
   }
   .logo-text {
     font-family:'Fraunces', serif;
     font-weight:600;
-    font-size:1.35rem;
+    font-size:1.8rem;
     letter-spacing:-0.01em;
   }
   .logo-text span {
@@ -129,7 +129,7 @@
   /* ---------- hero ---------- */
   .hero{
     min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end;
-    position:relative; padding:150px 40px 0;
+    position:relative; padding:180px 40px 0;
     background:
       radial-gradient(ellipse 60% 50% at 80% 10%, rgba(226,255,92,0.10), transparent 60%),
       radial-gradient(ellipse 50% 40% at 10% 90%, rgba(255,107,74,0.08), transparent 60%);
@@ -326,7 +326,7 @@
   /* ---------- footer ---------- */
   footer{padding:60px 40px 40px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;}
   .footer-left{display:flex; align-items:center; gap:18px;}
-  .footer-logo{height:28px; width:auto; opacity:0.7;}
+  .footer-logo{height:40px; width:auto; opacity:0.7;}
   footer .mono{font-size:0.75rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em;}
   .footer-links{display:flex; gap:26px;}
   .footer-links a{font-size:0.78rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em; transition:color .3s;}
@@ -335,8 +335,8 @@
   @media (max-width:760px){
     nav ul, .nav-cta{display:none;}
     header{padding:20px;}
-    .site-logo{height:44px;}
-    .hero{padding:120px 20px 0;}
+    .site-logo{height:64px;}
+    .hero{padding:140px 20px 0;}
     section{padding:90px 20px;}
     .cta-section{margin:0 20px; padding:60px 28px;}
     .cta-bg-mark-img{display:none;}
